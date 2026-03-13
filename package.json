@@ -1,0 +1,15 @@
+{
+  "name": "devtinder-be",
+  "version": "1.0.0",
+  "description": "Tender for developers",
+  "main": "index.js",
+  "scripts": {
+    "start" : "node run src/app.js",
+    "dev" : "nodemon src/app.js" 
+  },
+  "author": "Pranay",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
