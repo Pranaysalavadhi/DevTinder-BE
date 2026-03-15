@@ -1,27 +1,19 @@
 const express = require("express")
 
 const app = express();
-app.get("/user",(req,res) =>{
-    res.send("User form express js")
+
+const {adminAuth} = require('./middleware/auth')
+
+app.use("/",adminAuth)
+
+app.get("/admin/getAllData",(req,res)=>{
+    res.send("get all data of admin data");
 })
 
-app.get("/",(req,res,next) =>{
-    res.send("Hello from backend with nodemon")
-})
-app.get("/random.text",(req,res,next) =>{
-    res.send("random.text")
-})
-
-app.get('/user/:userId/:name/:password',(req,res) =>{
-   console.log(req.params)
-   res.send({firstname: 'Pranay'})
-})
-
-app.all('/secret', (req, res, next) => {
-  console.log('Accessing the secret section ...')
-  next() // pass control to the next handler
+app.get("/admin/deleteData",(req,res) =>{
+    res.send("deleted all user data")
 })
 
 app.listen(3000,() =>{
-    console.log(" My app is successfully running on port no 3000")
+    console.log(" My app is successfully running on port no 3000") 
 })
