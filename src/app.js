@@ -1,6 +1,6 @@
 const express = require("express")
 const connectDB = require("./config/database");
-const Usermodel = require("./models/user");
+const User = require("./models/user");
 const app = express();
 
  app.use(express.json());
@@ -18,7 +18,7 @@ const app = express();
 
     app.post("/signup", async (req,res) =>{
       // creating a mew instance of the usermodel.
-      const user = Usermodel(req.body);
+      const user = User(req.body);
       try{
         await user.save();
         res.send("user added successfully in db")
@@ -27,4 +27,29 @@ const app = express();
          res.status(400).send("Error saving the user : " + err.message)
       }
       
+      })
+    app.get('/user', async (req,res) =>{
+      const UserEmail = req.body.emailId;
+      try{
+        const user = await User.findOne({emailId: UserEmail});
+        if(!user){
+        res.status(400).send("user not found");
+        }
+          res.send(user);
+
+      }
+      catch(err){
+         res.status(400).send("Something went wrong");
+      }
+        
+    })
+
+    app.get('/feed',async (req,res) =>{
+      try{
+        const users = await User.find({});
+        res.send(users)
+      }
+      catch(err){
+        res.status(400).send("Something went wrong");
+      }
     })
