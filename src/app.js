@@ -3,6 +3,8 @@ const connectDB = require("./config/database");
 const Usermodel = require("./models/user");
 const app = express();
 
+ app.use(express.json());
+
  connectDB()
     .then(() =>{
         console.log("Database connection established...");
@@ -15,12 +17,14 @@ const app = express();
     })
 
     app.post("/signup", async (req,res) =>{
-     const user = new Usermodel({
-        firstName: "Pranay",
-        lastName: "Salavadhi",
-        emailId: "pranaysalavadhi@gmail.com",
-        password: "pranay@18"
-     });
-      await user.save();
-      res.send("user added successfully in db")
+      // creating a mew instance of the usermodel.
+      const user = Usermodel(req.body);
+      try{
+        await user.save();
+        res.send("user added successfully in db")
+      }
+      catch(err){
+         res.status(400).send("Error saving the user : " + err.message)
+      }
+      
     })
