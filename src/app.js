@@ -62,7 +62,7 @@ const app = express();
 
       try{
 
-        const ALLOWED_UPDATES = ["photoUrl","about","gender","age","skills"];
+        const ALLOWED_UPDATES = ["photoUrl","about","gender","age","skills","password"];
         const isUpdateAllowed = Object.keys(data).every(k =>
           ALLOWED_UPDATES.includes(k)
 );
