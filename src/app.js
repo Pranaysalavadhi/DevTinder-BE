@@ -5,18 +5,17 @@ const app = express();
 
  app.use(express.json());
 
-    app.post("/signup", async (req,res) =>{
-      // creating a mew instance of the usermodel.
-      const user = User(req.body);
-      try{
-        await user.save();
-        res.send("user added successfully in db")
+    app.post("/signup", async (req, res) => {
+      try {
+        if (await User.findOne({ emailId: req.body.emailId }))
+          return res.status(400).send("Email already exists");
+
+        await new User(req.body).save();
+        res.send("User added Successfully !!");
+      } catch (e) {
+        res.status(400).send(e.message);
       }
-      catch(err){
-         res.status(400).send("Error saving the user : " + err.message)
-      }
-      
-      })
+    });
     app.get('/user', async (req,res) =>{
       const UserEmail = req.body.emailId;
       try{
@@ -62,11 +61,13 @@ const app = express();
       const data = req.body;
 
       try{
-        const user = await User.findByIdAndUpdate(userId,data);
+        const user = await User.findByIdAndUpdate(userId,data,{
+          runValidators: true,
+        });
         res.send("User updated successfully");
       }
       catch(err){
-        res.status(400).send("something went wrong ");
+        res.status(400).send("UPDATE FAILED : "+ err.message);
       }
 
     })
