@@ -32,29 +32,32 @@ const app = express();
       }
     });
 
-    app.post("/login", async (req,res) =>{ 
-      try{
+    app.post("/login", async (req, res) => {
+      try {
         const { emailId, password } = req.body;
-        
-        const user = await User.findOne({emailId : emailId})
-
-        if(!user){
-          throw new Error("Invalid Credentials")
+        // validation
+        if (!emailId || !password) {
+          return res.status(400).json({ message: "Email and password are required" });
         }
+
+        const user = await User.findOne({ emailId });
+
+        if (!user) {
+          return res.status(401).json({ message: "Invalid credentials" });
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if(isPasswordValid){
-          res.send("Login Successful !!!")
-        }
-        else{
-          throw new Error("Invalid Credentials")
-        }
-       }
-      catch(err){
-        res.status(400).send("ERROR: " + err.message);
-      }
-        
 
-    })
+        if (!isPasswordValid) {
+          return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        res.json({ message: "Login successful" });
+
+      } catch (err) {
+        res.status(500).json({ message: "Something went wrong" });
+      }
+    });
     app.get('/user/:userId', async (req,res) =>{
       const userId = req.params?.userId;
       try{
