@@ -1,25 +1,41 @@
 const express = require("express")
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const {validateSignUpData} = require("./utils/validation")
+const bcrypt = require("bcrypt")
 const app = express();
 
  app.use(express.json());
 
     app.post("/signup", async (req, res) => {
       try {
+      // Validate the data
+        validateSignUpData(req);
+
+        const {firstName,lastName,emailId,password} = req.body;
+      // Encrypt the password
+        
+        const hashPassword = await bcrypt.hash(password,10)
+        console.log(hashPassword);
+     
         if (await User.findOne({ emailId: req.body.emailId }))
           return res.status(400).send("Email already exists");
 
-        await new User(req.body).save();
+        await new User({
+          firstName,
+          lastName,
+          emailId,
+          password:hashPassword,
+        }).save();
         res.send("User added Successfully !!");
       } catch (e) {
         res.status(400).send(e.message);
       }
     });
-    app.get('/user', async (req,res) =>{
-      const UserEmail = req.body.emailId;
+    app.get('/user/:userId', async (req,res) =>{
+      const userId = req.params?.userId;
       try{
-        const user = await User.findOne({emailId: UserEmail});
+        const user = await User.findOne({_id : userId});
         if(!user){
         res.status(400).send("user not found");
         }
@@ -42,8 +58,8 @@ const app = express();
       }
     })
 
-    app.delete('/user', async (req,res) => {
-      const userId = req.body._id;
+    app.delete('/user/:userId', async (req,res) => {
+      const userId = req.params?.userId;
       try{
         const user = await User.findByIdAndDelete(userId);
         if(!user)
