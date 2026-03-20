@@ -16,7 +16,6 @@ const app = express();
       // Encrypt the password
         
         const hashPassword = await bcrypt.hash(password,10)
-        console.log(hashPassword);
      
         if (await User.findOne({ emailId: req.body.emailId }))
           return res.status(400).send("Email already exists");
@@ -32,6 +31,30 @@ const app = express();
         res.status(400).send(e.message);
       }
     });
+
+    app.post("/login", async (req,res) =>{ 
+      try{
+        const { emailId, password } = req.body;
+        
+        const user = await User.findOne({emailId : emailId})
+
+        if(!user){
+          throw new Error("Invalid Credentials")
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(isPasswordValid){
+          res.send("Login Successful !!!")
+        }
+        else{
+          throw new Error("Invalid Credentials")
+        }
+       }
+      catch(err){
+        res.status(400).send("ERROR: " + err.message);
+      }
+        
+
+    })
     app.get('/user/:userId', async (req,res) =>{
       const userId = req.params?.userId;
       try{
