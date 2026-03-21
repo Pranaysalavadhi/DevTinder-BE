@@ -6,6 +6,7 @@ const {validateSignUpData} = require("./utils/validation")
 const bcrypt = require("bcrypt")
 const cookieParser = require("cookie-parser")
 const jwt = require("jsonwebtoken")
+const {userAuth} = require("./middleware/auth")
 
 
  app.use(express.json()); // middleware
@@ -57,11 +58,12 @@ const jwt = require("jsonwebtoken")
         }
           // Create a JWT Token
 
-          const token = await jwt.sign({_id: user._id}, "DEV@Tinder");
-          console.log(token)
+          const token = await jwt.sign({_id: user._id}, "DEV@Tinder",{expiresIn: "1d",});
 
           // add the token to cookie and send the response back to user.
-          res.cookie("token", token);
+          res.cookie("token", token,{
+            expires: new Date(Date.now() + 8 * 3600000),
+          });
 
           res.json({ message: "Login successful" });
 
@@ -70,93 +72,24 @@ const jwt = require("jsonwebtoken")
       }
     });
 
-     app.get("/profile", async (req,res) =>{
+     app.get("/profile", userAuth, async (req,res) =>{
       try{
-        const cookies = req.cookies;
-      
-      const {token} = cookies;
-      // Validate the token
-
-      const decodedMessage = await jwt.verify(token, "DEV@Tinder");
-      const {_id} = decodedMessage;
- 
-      const user = await User.findById(_id);
-      if(!user){
-        throw new Error("User does not exist");
-      }
+      const user = req.user;
       res.send(user)
-    }
+      }
       catch(err){
         res.status(400).send("ERROR: "+err.message);
       }
     })
 
-    app.get('/user/:userId', async (req,res) =>{
-      const userId = req.params?.userId;
-      try{
-        const user = await User.findOne({_id : userId});
-        if(!user){
-        res.status(400).send("user not found");
+    app.get("/sendConnectionRequest", userAuth, async (req,res) =>{
+        try{
+          const user = req.user;
+          res.send(user.firstName +" sent the connection request!")
         }
-          res.send(user);
-
-      }
-      catch(err){
-         res.status(400).send("Something went wrong");
-      }
-        
-    })
-
-    app.get('/feed',async (req,res) =>{
-      try{
-        const users = await User.find({});
-        res.send(users)
-      }
-      catch(err){
-        res.status(400).send("Something went wrong");
-      }
-    })
-
-    app.delete('/user/:userId', async (req,res) => {
-      const userId = req.params?.userId;
-      try{
-        const user = await User.findByIdAndDelete(userId);
-        if(!user)
-          res.status(400).send("User not found");
-
-        res.send("User deleted successfully");
-      }
-      catch(err){
-        res.status(400).send("Something went wrong");
-      }
-    })
-
-    app.patch('/user/:userId', async (req,res) =>{
-      const userId = req.params?.userId;
-      const data = req.body;
-
-      try{
-
-        const ALLOWED_UPDATES = ["photoUrl","about","gender","age","skills","password"];
-        const isUpdateAllowed = Object.keys(data).every(k =>
-          ALLOWED_UPDATES.includes(k)
-);
-        if(!isUpdateAllowed){
-          throw new Error("Update not Allowed");
+        catch(err){
+          res.status(400).send(err.message);
         }
-        if(data?.skills.length > 10){
-          throw new Error(" Skills Cannot be more than 10 ");
-        }
-
-        const user = await User.findByIdAndUpdate(userId,data,{
-          runValidators: true,
-        });
-        res.send("User updated successfully");
-      }
-      catch(err){
-        res.status(400).send("UPDATE FAILED : "+ err.message);
-      }
-
     })
 
      connectDB()
@@ -165,7 +98,7 @@ const jwt = require("jsonwebtoken")
         app.listen(3000,() =>{
         console.log(" My app is successfully running on port no 3000") 
        })
-    })
+    }) 
     .catch((err) => {
         console.error("Database cannot be connected!!");
     })
