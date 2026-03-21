@@ -1,9 +1,12 @@
 const express = require("express")
 const connectDB = require("./config/database");
+const app = express();
 const User = require("./models/user");
 const {validateSignUpData} = require("./utils/validation")
 const bcrypt = require("bcrypt")
-const app = express();
+const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken")
+
 
  app.use(express.json());
 
