@@ -48,7 +48,7 @@ const userSchema = mongoose.Schema(
             }
         }
     },
-    photourl: {
+    photoUrl: {
         type: String,
         default: "https://hancockogundiyapartners.com/wp-content/uploads/2019/07/dummy-profile-pic-300x300.jpg"
     },

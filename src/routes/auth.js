@@ -24,6 +24,7 @@ const bcrypt = require("bcrypt")
           emailId,
           password:hashPassword,
         }).save();
+        
         res.send("User added Successfully !!");
       } catch (e) {
         res.status(400).send(e.message);
@@ -61,5 +62,13 @@ const bcrypt = require("bcrypt")
         res.status(500).json({ message: "Something went wrong" });
       }
     });
+
+    router.post('/logout', async (req,res) =>{
+      res
+         .cookie("token",null,{
+          expires: new Date(Date.now()),
+          })
+         .send('logged out successful!!');
+    })
 
     module.exports = router;
