@@ -4,7 +4,7 @@
   "description": "Tender for developers",
   "main": "index.js",
   "scripts": {
-    "start": "node run src/app.js",
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
   "author": "Pranay",
