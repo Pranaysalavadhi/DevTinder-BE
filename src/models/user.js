@@ -57,14 +57,14 @@ const userSchema = mongoose.Schema(
     },
     skills: {
       type: [String]
-    },
-    resetPasswordToken: {
-      type: String,
-      select: false
-    },
-    resetPasswordExpires: {
-      type: Date,
-      select: false
+    // },
+    // resetPasswordToken: {
+    //   type: String,
+    //   select: false
+    // },
+    // resetPasswordExpires: {
+    //   type: Date,
+    //   select: false
     }
 },
 {
@@ -73,13 +73,13 @@ const userSchema = mongoose.Schema(
 // schema methods
 userSchema.index({firstName:1, lastName: 1});
 
-userSchema.pre('save', async function(next) {
-  const user = this;
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 10);
-  }
-//   next();
-});
+// userSchema.pre('save', async function(next) {
+//   const user = this;
+//   if (user.isModified('password')) {
+//     user.password = await bcrypt.hash(user.password, 10);
+//   }
+// //   next();
+// });
 
 userSchema.methods.getJWT = async function(){ 
     const user = this;
@@ -95,36 +95,36 @@ userSchema.methods.validatePassword = async function(passwordInputByUser){
     return isPasswordValid;
 }
 
-userSchema.methods.generatePasswordReset = async function(){
-  const crypto = require('crypto');
-  const user = this;
+// userSchema.methods.generatePasswordReset = async function(){
+//   const crypto = require('crypto');
+//   const user = this;
 
-  const token = crypto.randomBytes(20).toString('hex');
-  user.resetPasswordToken = token;
-  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+//   const token = crypto.randomBytes(20).toString('hex');
+//   user.resetPasswordToken = token;
+//   user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-  await user.save();
-  return token;
-}
+//   await user.save();
+//   return token;
+// }
 
-userSchema.statics.resetPassword = async function(token, newPassword){
-  const User = this;
-  const user = await User.findOne({
-    resetPasswordToken: token,
-    resetPasswordExpires: { $gt: Date.now() }
-  });
+// userSchema.statics.resetPassword = async function(token, newPassword){
+//   const User = this;
+//   const user = await User.findOne({
+//     resetPasswordToken: token,
+//     resetPasswordExpires: { $gt: Date.now() }
+//   });
 
-  if (!user) {
-    throw new Error('Invalid or expired password reset token');
-  }
+//   if (!user) {
+//     throw new Error('Invalid or expired password reset token');
+//   }
 
-  user.password = newPassword;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpires = undefined;
+//   user.password = newPassword;
+//   user.resetPasswordToken = undefined;
+//   user.resetPasswordExpires = undefined;
 
-  await user.save();
-  return user;
-}
+//   await user.save();
+//   return user;
+// }
 
 const Usermodel = mongoose.model("user",userSchema);
 

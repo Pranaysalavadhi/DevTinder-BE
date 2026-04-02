@@ -74,7 +74,7 @@ const User = require("../models/user")
           connectionRequest.status = status;
 
           const data = await connectionRequest.save();
-          res.json({message: "Connection Request" + status, data});
+          res.json({message: "Connection Request " + status, data});
 
         }
         catch(err){
