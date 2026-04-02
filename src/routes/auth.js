@@ -16,7 +16,7 @@ const bcrypt = require("bcrypt")
         const hashPassword = await bcrypt.hash(password,10)
      
         if (await User.findOne({ emailId: req.body.emailId }))
-          return res.status(400).send("Email already exists");
+          return res.status(400).send("Email already exists Please login");
 
         await new User({
           firstName,
@@ -70,5 +70,47 @@ const bcrypt = require("bcrypt")
           })
          .send('logged out successful!!');
     })
+
+    router.post('/forgot-password', async (req, res) => {
+      try {
+        const { emailId } = req.body;
+        if (!emailId) {
+          return res.status(400).json({ message: 'Email is required' });
+        }
+
+        const user = await User.findOne({ emailId });
+        if (!user) {
+          return res.status(404).json({ message: 'No user found with that email' });
+        }
+
+        const resetToken = await user.generatePasswordReset();
+
+        // In production send email. For now return reset token/link.
+        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password?token=${resetToken}`;
+
+        return res.status(200).json({
+          message: 'Password reset token generated. Use this token to reset password',
+          resetUrl,
+          token: resetToken
+        });
+      } catch (err) {
+        res.status(500).json({ message: 'Unable to process forgot password', error: err.message });
+      }
+    });
+
+    router.post('/reset-password', async (req, res) => {
+      try {
+        const { token, password } = req.body;
+        if (!token || !password) {
+          return res.status(400).json({ message: 'Token and new password are required' });
+        }
+
+        await User.resetPassword(token, password);
+
+        return res.status(200).json({ message: 'Password has been reset successfully' });
+      } catch (err) {
+        res.status(400).json({ message: err.message });
+      }
+    });
 
     module.exports = router;
