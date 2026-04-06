@@ -56,7 +56,7 @@ const bcrypt = require("bcrypt")
         const isPasswordValid = await user.validatePassword(password);
 
         if (!isPasswordValid) {
-          return res.status(401).json({ message: "Invalid credentials p" });
+          return res.status(401).json({ message: " Invalid credentials " });
         }
           const token = await user.getJWT();
       
