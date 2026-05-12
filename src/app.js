@@ -7,10 +7,16 @@ const cors = require("cors");
 require("dotenv").config();
 
  // middlewares
- app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true,
- }));
+
+//  app.use(cors({
+//     origin: "http://localhost:5173",
+//     credentials: true,
+//  }));
+
+app.use(cors({
+  origin: "https://devtinder-ui.onrender.com", // Replace with your actual Render UI URL
+  credentials: true
+}));
  app.use(express.json()); 
  app.use(cookieParser())  
 

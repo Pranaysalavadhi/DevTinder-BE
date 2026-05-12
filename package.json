@@ -1,7 +1,7 @@
 {
   "name": "devtinder-be",
   "version": "1.0.0",
-  "description": "Tender for developers",
+  "description": "Tinder for developers",
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
