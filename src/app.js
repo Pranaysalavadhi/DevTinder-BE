@@ -14,9 +14,11 @@ require("dotenv").config();
 //  }));
 
 app.use(cors({
-  origin: "https://devtinder-ui.onrender.com", // Replace with your actual Render UI URL
+  // Add your Vercel URL here
+  origin: "https://dev-tinder-web-blond-six.vercel.app", 
   credentials: true
 }));
+
  app.use(express.json()); 
  app.use(cookieParser())  
 
