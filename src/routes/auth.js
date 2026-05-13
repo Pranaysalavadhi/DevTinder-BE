@@ -60,11 +60,18 @@ const bcrypt = require("bcrypt")
         }
           const token = await user.getJWT();
       
-          res.cookie("token", token,{
-            expires: new Date(Date.now() + 8 * 3600000),
+          res.cookie("token", token, {
+              expires: new Date(Date.now() + 8 * 3600000),
+              httpOnly: true,    // Prevents frontend JS from accessing the cookie (Security)
+              secure: true,      // REQUIRED for sameSite: "none" (works on HTTPS Render)
+              sameSite: "none",  // REQUIRED for cross-domain (Vercel to Render)
           });
 
-          res.json({ message: "Login successful" });
+          // ... after setting the cookie
+        res.json({ 
+            message: "Login successful", 
+            data: user // This ensures your frontend 'res.data.data' exists
+        });
 
       } catch (err) {
         res.status(500).json({ message: "Something went wrong" });
